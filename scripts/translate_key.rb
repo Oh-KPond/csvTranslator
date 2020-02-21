@@ -2,4 +2,36 @@ require 'csv'
 
 table = CSV.parse(File.read("data/translation_key02192020.csv"), headers: true)
 
-print(table)
+# The structure I want to end up with in Go
+# 
+# map[string]map[string]string {
+#     "German": map[string]string {
+#         "germanWord":"englishWord",
+#         "germanWord2":"englishWord2",
+#     },
+#     "French": map[string]string {
+#         "frenchWord":"englishWord",
+#         "frenchWord2":"englishWord2",
+#     },
+# }
+
+# dataDict = { :nested_hash => { :first_key => 'Hello' } }
+dataDict = {}
+
+# make dataDict Language keys
+table.headers.each do |header|
+    dataDict[header] = {}
+end
+
+# make each Language key have map of {languageWord : englishWord}
+dataDict.each do |language, innerMap|
+    len = table.by_col["English"].length
+    i = 0
+    while i < len
+        newKey = table[i][language]
+        dataDict[language][newKey] = table[i]["English"]
+        i += 1
+    end
+end
+
+print(dataDict["German"])
